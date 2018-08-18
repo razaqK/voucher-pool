@@ -1,7 +1,7 @@
-# Voucher API [Documentation](https://documenter.getpostman.com/view/1419985/RWMLL6Gs)
-Link to [Documentation](https://documenter.getpostman.com/view/1419985/RWMLL6Gs){:target="_blank"}
+# Voucher API [Documentation](https://documenter.getpostman.com/view/1419985/RWToQdhZ)
+Link to [Documentation](https://documenter.getpostman.com/view/1419985/RWToQdhZ){:target="_blank"}
 ### Using Docker to install.
- - Clone `git@github.com:razaqK/voucher.git`
+ - Clone `git@github.com:razaqK/voucher-pool.git`
  - Run `cd voucher-pool`
  - Run `docker-compose up`. This command build the images and start the containers
  - On you browser go to [localhost:port](http://127.0.0.1)
@@ -17,7 +17,7 @@ Link to [Documentation](https://documenter.getpostman.com/view/1419985/RWMLL6Gs)
  - Run command `vendor/bin/phpunit` 
  
 ### API Documentation
-Check the api documentation [here](https://documenter.getpostman.com/view/1419985/RWMLL6Gs)
+Check the api documentation [here](https://documenter.getpostman.com/view/1419985/RWToQdhZ)
 
 # Database Configuration
  - Run `php /var/www/vendor/bin/phinx migrate`
