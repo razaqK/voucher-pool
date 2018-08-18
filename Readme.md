@@ -1,5 +1,5 @@
 # Voucher API [Documentation](https://documenter.getpostman.com/view/1419985/RWToQdhZ)
-Link to [Documentation](https://documenter.getpostman.com/view/1419985/RWToQdhZ){:target="_blank"}
+
 ### Using Docker to install.
  - Clone `git@github.com:razaqK/voucher-pool.git`
  - Run `cd voucher-pool`
