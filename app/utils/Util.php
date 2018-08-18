@@ -17,7 +17,7 @@ class Util
      * @param $roles
      * @return array
      */
-    public static function validateRequest($payload, $roles)
+    public static function validateRequest($payload, array $roles) : array
     {
         $validated = GUMPHelper::is_valid((array)$payload, $roles);
         if ($validated === true) {
@@ -37,13 +37,13 @@ class Util
      * @param $toLower
      * @return string
      */
-    public static function generateRandomShortCode($length = 5, $toLower = false)
+    public static function generateRandomShortCode(int $length = 5, bool $toLower = false) : string
     {
         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randomString = '';
         for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, $charactersLength - 1)];
+            $randomString .= $characters[random_int(0, $charactersLength - 1)];
         }
 
         return $toLower ? strtolower($randomString) : $randomString;
@@ -54,7 +54,7 @@ class Util
      * @param $params
      * @return array
      */
-    public static function stripHtmlTags($params)
+    public static function stripHtmlTags(array $params) : array
     {
         return array_map(function ($v) {
             return strtolower(strip_tags($v));
@@ -67,7 +67,7 @@ class Util
      * @param $limit
      * @return array
      */
-    public static function getOffsetAndLimit($page, $limit)
+    public static function getOffsetAndLimit($page, $limit) : array
     {
         $limit = empty($limit) || $limit <= 0 ? 1000 : $limit;
         $offset = empty($page) || $page <= 0 ? 0 : ($page - 1) * $limit;

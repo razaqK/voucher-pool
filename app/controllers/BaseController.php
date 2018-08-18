@@ -8,7 +8,6 @@
 
 namespace App\Controller;
 
-use App\Util\GUMPHelper;
 use App\Util\Util;
 use Psr\Container\ContainerInterface;
 use App\Traits\ResponseTrait;
@@ -34,7 +33,7 @@ class BaseController
         $this->_container = $container;
     }
 
-    public function getContainer()
+    public function getContainer() : ContainerInterface
     {
         return $this->_container;
     }
@@ -42,12 +41,12 @@ class BaseController
     /**
      * @return Request
      */
-    public function request()
+    public function request() : Request
     {
         return $this->getContainer()->get('request');
     }
 
-    public function setResponse($response)
+    public function setResponse(Response $response)
     {
         $this->_response = $response;
     }
@@ -55,7 +54,7 @@ class BaseController
     /**
      * @return Response
      */
-    public function response()
+    public function response() : Response
     {
         return $this->_response;
     }
@@ -65,7 +64,7 @@ class BaseController
      * @param $roles
      * @return array
      */
-    protected function validateParameters($payload, $roles)
+    protected function validateParameters($payload, array $roles)
     {
         return Util::validateRequest($payload, $roles);
     }

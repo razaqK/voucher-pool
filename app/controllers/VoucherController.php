@@ -42,11 +42,10 @@ class VoucherController extends BaseController
                 return $this->sendFail(sprintf(ResponseMessages::INVALID_PARAMS, $valid['message']), ResponseCodes::INVALID_PARAMS, 400, $valid['data']);
             }
 
-            $offer = new SpecialOfferHelper();
-            $offer->add($payload['name'], $payload['discount']); // create special offer
+            $this->getContainer()->specialOfferHelper->add($payload['name'], $payload['discount']); // create special offer
 
-            return $this->sendSuccess(['name' => $offer->getOffer()->name]);
-        } catch (\Exception $exception) {
+            return $this->sendSuccess(['name' => $this->getContainer()->specialOfferHelper->getOffer()->name]);
+        } catch (\Throwable $exception) {
             return $this->sendError(ResponseMessages::INTERNAL_SERVER_ERROR, ResponseCodes::INTERNAL_SERVER_ERROR, 500, $exception->getMessage());
         }
     }
@@ -72,15 +71,14 @@ class VoucherController extends BaseController
                 return $this->sendFail(sprintf(ResponseMessages::INVALID_PARAMS, $valid['message']), ResponseCodes::INVALID_PARAMS, 400, $valid['data']);
             }
 
-            $recipient = new RecipientHelper();
             // check if user already exist
-            if ($recipient->get($payload['email'], 'email')->exist()) {
+            if ($this->getContainer()->recipientHelper->get($payload['email'], 'email')->exist()) {
                 return $this->sendFail(ResponseMessages::USER_EXIST, ResponseCodes::USER_EXIST, 400);
             }
-            $recipient->add($payload['name'], $payload['email']);
+            $this->getContainer()->recipientHelper->add($payload['name'], $payload['email']);
 
             return $this->sendSuccess([]);
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             return $this->sendError(ResponseMessages::INTERNAL_SERVER_ERROR, ResponseCodes::INTERNAL_SERVER_ERROR, 500, $exception->getMessage());
         }
     }
@@ -107,18 +105,19 @@ class VoucherController extends BaseController
                 return $this->sendFail(sprintf(ResponseMessages::INVALID_PARAMS, $valid['message']), ResponseCodes::INVALID_PARAMS, 400, $valid['data']);
             }
 
-            $offer = new SpecialOfferHelper();
             // checking if it is a valid special offer
-            if (!$offer->get($payload['special_offer_id'], 'id')->exist()) {
+            if (!$this->getContainer()->specialOfferHelper->get($payload['special_offer_id'], 'id')->exist()) {
                 return $this->sendFail(sprintf(ResponseMessages::INVALID_PARAMS, 'The special offer id supplied is invalid'), ResponseCodes::INVALID_PARAMS, 400);
             }
 
-            $voucher = new VoucherHelper();
-            $voucher->generateCodeForActiveRecipients($offer->getOffer()->id, Carbon::now()->addSeconds($payload['expires_in'])->toDateTimeString(), $payload['expires_in']);
+            $this->getContainer()->voucherHelper->generateCodeForActiveRecipients(
+                $this->getContainer()->specialOfferHelper->getOffer()->id,
+                Carbon::now()->addSeconds($payload['expires_in'])->toDateTimeString(),
+                $payload['expires_in']
+            );
 
-            $this->_request;
             return $this->sendSuccess([]);
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             return $this->sendError(ResponseMessages::INTERNAL_SERVER_ERROR, ResponseCodes::INTERNAL_SERVER_ERROR, 500, $exception->getMessage());
         }
     }
@@ -144,27 +143,29 @@ class VoucherController extends BaseController
                 return $this->sendFail(sprintf(ResponseMessages::INVALID_PARAMS, $valid['message']), ResponseCodes::INVALID_PARAMS, 400, $valid['data']);
             }
 
-            $recipient = new RecipientHelper();
             // check if recipient exist
-            if (!$recipient->get($payload['email'], 'email')->exist()) {
+            if (!$this->getContainer()->recipientHelper->get($payload['email'], 'email')->exist()) {
                 return $this->sendFail(sprintf(ResponseMessages::NOT_FOUND, 'user account'), ResponseCodes::NOT_FOUND, 404);
             }
 
-            $offer = new SpecialOfferHelper();
             // check if the special offer is valid
-            if (!$offer->get($payload['special_offer_id'], 'id')->exist()) {
+            if (!$this->getContainer()->specialOfferHelper->get($payload['special_offer_id'], 'id')->exist()) {
                 return $this->sendFail(sprintf(ResponseMessages::INVALID_PARAMS, 'The special offer id supplied is invalid'), ResponseCodes::INVALID_PARAMS, 400);
             }
 
-            $voucher = new VoucherHelper();
             // generate voucher code with expiry date
-            $voucher->generate($payload['special_offer_id'], $recipient->getRecipient()->id, Carbon::now()->addSeconds($payload['expires_in'])->toDateTimeString(), $payload['expires_in']);
+            $this->getContainer()->voucherHelper->generate(
+                $payload['special_offer_id'],
+                $this->getContainer()->recipientHelper->getRecipient()->id,
+                Carbon::now()->addSeconds($payload['expires_in'])->toDateTimeString(),
+                $payload['expires_in']
+            );
 
             return $this->sendSuccess([
-                'code' => $voucher->getVoucher()->getCode(),
-                'expiry_date' => $voucher->getVoucher()->getExpiryDate()
+                'code' => $this->getContainer()->voucherHelper->getVoucher()->getCode(),
+                'expiry_date' => $this->getContainer()->voucherHelper->getVoucher()->getExpiryDate()
             ]);
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             return $this->sendError(ResponseMessages::INTERNAL_SERVER_ERROR, ResponseCodes::INTERNAL_SERVER_ERROR, 500, $exception->getMessage());
         }
     }
@@ -191,32 +192,30 @@ class VoucherController extends BaseController
                 return $this->sendFail(sprintf(ResponseMessages::INVALID_PARAMS, $valid['message']), ResponseCodes::INVALID_PARAMS, 400, $valid['data']);
             }
 
-            $recipientService = new RecipientHelper();
-            if (!$recipientService->get($payload['email'], 'email')->exist()) {
+            if (!$this->getContainer()->recipientHelper->get($payload['email'], 'email')->exist()) {
                 return $this->sendFail(sprintf(ResponseMessages::NOT_FOUND, 'user account'), ResponseCodes::NOT_FOUND, 404);
             }
 
-            $voucher = new VoucherHelper();
-            if (!$voucher->get(['code' => $payload['voucher_code'], 'recipient_id' => $recipientService->getRecipient()->id])->exist()) {
+            if (!$this->getContainer()->voucherHelper->get(['code' => $payload['voucher_code'], 'recipient_id' => $this->getContainer()->recipientHelper->getRecipient()->id])->exist()) {
                 return $this->sendFail(sprintf(ResponseMessages::VOUCHER_CODE_ERROR, 'provided is invalid'), ResponseCodes::VOUCHER_CODE_ERROR, 400);
             }
 
-            if ($voucher->isUsed()) {
+            if ($this->getContainer()->voucherHelper->isUsed()) {
                 return $this->sendFail(sprintf(ResponseMessages::VOUCHER_CODE_ERROR, 'has been used.'), ResponseCodes::VOUCHER_CODE_ERROR, 400);
             }
 
-            if ($voucher->hasExpired()) {
+            if ($this->getContainer()->voucherHelper->hasExpired()) {
                 return $this->sendFail(sprintf(ResponseMessages::VOUCHER_CODE_ERROR, 'has expired'), ResponseCodes::VOUCHER_CODE_ERROR, 400);
             }
 
             // redeem code by update the status, usage and date of usage
-            $voucher->redeem();
+            $this->getContainer()->voucherHelper->redeem();
 
             return $this->sendSuccess([
-                'discount_percentage' => $voucher->getVoucher()->specialOffer->discount,
-                'date_of_usage' => $voucher->getVoucher()->getDateOfUsage()
+                'discount_percentage' => $this->getContainer()->voucherHelper->getVoucher()->specialOffer->discount,
+                'date_of_usage' => $this->getContainer()->voucherHelper->getVoucher()->getDateOfUsage()
             ]);
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             return $this->sendError(ResponseMessages::INTERNAL_SERVER_ERROR, ResponseCodes::INTERNAL_SERVER_ERROR, 500, $exception->getMessage());
         }
     }
@@ -236,15 +235,14 @@ class VoucherController extends BaseController
             $query = $request->getQueryParams();
             list($offset, $limit) = Util::getOffsetAndLimit($query['page'], $query['limit']);
 
-            $voucher = new VoucherHelper();
-            $result = $voucher->getUserCodes($email, $offset, $limit);
+            $result = $this->getContainer()->voucherHelper->getUserCodes($email, $offset, $limit);
 
             if (empty($result->toArray())) {
                 return $this->sendFail(sprintf(ResponseMessages::NOT_FOUND, 'data'), ResponseCodes::NOT_FOUND, 400);
             }
 
             return $this->sendSuccess($result->toArray());
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             return $this->sendError(ResponseMessages::INTERNAL_SERVER_ERROR, ResponseCodes::INTERNAL_SERVER_ERROR, 500, $exception->getMessage());
         }
     }
@@ -263,15 +261,14 @@ class VoucherController extends BaseController
             $query = $request->getQueryParams();
             list($offset, $limit) = Util::getOffsetAndLimit($query['page'], $query['limit']);
 
-            $voucher = new VoucherHelper();
-            $result = $voucher->getAll($offset, $limit);
+            $result = $this->getContainer()->voucherHelper->getAll($offset, $limit);
 
             if (empty($result->toArray())) {
                 return $this->sendFail(sprintf(ResponseMessages::NOT_FOUND, 'data'), ResponseCodes::NOT_FOUND, 400);
             }
 
             return $this->sendSuccess($result->toArray());
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             return $this->sendError(ResponseMessages::INTERNAL_SERVER_ERROR, ResponseCodes::INTERNAL_SERVER_ERROR, 500, $exception->getMessage());
         }
     }

@@ -21,7 +21,7 @@ class RecipientHelper
      * @return mixed
      * @throws \Exception
      */
-    public function add($name, $email)
+    public function add(string $name, string $email) : self
     {
         try {
             /** @var Recipient $recipient */
@@ -50,7 +50,7 @@ class RecipientHelper
      * @param $field
      * @return $this
      */
-    public function get($value, $field)
+    public function get($value, string $field) : self
     {
         $recipient = Recipient::getByFirstField($field, $value);
         $this->setRecipient($recipient);
@@ -76,7 +76,7 @@ class RecipientHelper
     /**
      * @return bool
      */
-    public function exist()
+    public function exist() : bool
     {
         return $this->getRecipient() instanceof Recipient;
     }

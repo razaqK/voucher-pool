@@ -28,7 +28,7 @@ class VoucherHelper
      * @return mixed
      * @throws \Exception
      */
-    public function generate($offerId, $recipientId, $expireDate, $expireInterval)
+    public function generate($offerId, $recipientId, string $expireDate, $expireInterval) : self
     {
         try {
             $code = new Voucher();
@@ -45,7 +45,7 @@ class VoucherHelper
             $code->refresh();
             $this->setVoucher($code);
             return $this;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             throw new \Exception($e->getMessage());
         }
     }
@@ -56,7 +56,7 @@ class VoucherHelper
      * @return $this
      * @throws \Exception
      */
-    public function get(array $data)
+    public function get(array $data) : self
     {
         $voucher = Voucher::getByFirstFields($data);
         if (!$voucher) {
@@ -87,7 +87,7 @@ class VoucherHelper
      * check if voucher has expired
      * @return bool
      */
-    public function hasExpired()
+    public function hasExpired() : bool
     {
         if ($this->getVoucher()->status == Status::EXPIRED) {
             return true;
@@ -114,7 +114,7 @@ class VoucherHelper
      * check if voucher code has been used
      * @return bool
      */
-    public function isUsed()
+    public function isUsed() : bool
     {
         return (bool)$this->getVoucher()->getIsUsed();
     }
@@ -142,7 +142,7 @@ class VoucherHelper
      *
      * @return bool
      */
-    public function exist()
+    public function exist() : bool
     {
         return $this->getVoucher() instanceof Voucher;
     }
@@ -155,7 +155,7 @@ class VoucherHelper
      * @return bool
      * @throws \Exception
      */
-    public function generateCodeForActiveRecipients($offerId, $expireDate, $expireInterval)
+    public function generateCodeForActiveRecipients($offerId, $expireDate, $expireInterval) : bool
     {
         $recipients = Recipient::where(['status' => Status::ACTIVE])->get();
         if (empty($recipients)){

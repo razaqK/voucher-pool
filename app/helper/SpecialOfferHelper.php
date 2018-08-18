@@ -21,7 +21,7 @@ class SpecialOfferHelper
      * @return mixed
      * @throws \Exception
      */
-    public function add($name, $discount)
+    public function add(string $name, $discount) : self
     {
         try {
             $offer = new SpecialOffer();
@@ -35,7 +35,7 @@ class SpecialOfferHelper
             $offer->refresh();
             $this->setOffer($offer);
             return $this;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             throw new \Exception($e->getMessage());
         }
     }
@@ -46,7 +46,7 @@ class SpecialOfferHelper
      * @return $this
      * @throws \Exception
      */
-    public function get($value, $field)
+    public function get($value, string $field) : self
     {
         $offer = SpecialOffer::getByFirstField($field, $value);
         if (!$offer) {
@@ -75,7 +75,7 @@ class SpecialOfferHelper
     /**
      * @return bool
      */
-    public function exist()
+    public function exist() : bool
     {
         return $this->getOffer() instanceof SpecialOffer;
     }

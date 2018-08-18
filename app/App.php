@@ -25,6 +25,8 @@ class App
 
         include __DIR__ . '/../app/config/db.php';
 
+        include __DIR__ . '/../app/config/helper.php';
+
         include __DIR__ . '/../app/config/error.php';
 
         include __DIR__ . '/../app/routes/v1_api.php';

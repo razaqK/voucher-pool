@@ -10,17 +10,17 @@ namespace App\Traits;
 
 trait ResponseTrait
 {
-    protected function sendSuccess(array $data, $status = 200)
+    protected function sendSuccess(array $data, int $status = 200)
     {
         return $this->response()->withStatus($status)->withJson(['status' => 'success', 'data' => $data]);
     }
 
-    protected function sendError($message, $code, $status = 500, $trace = null)
+    protected function sendError(string $message, string $code, int $status = 500, $trace = null)
     {
         return $this->response()->withStatus($status)->withJson(['status' => 'error', 'message' => $message, 'code' => $code, 'trace' => $trace]);
     }
 
-    protected function sendFail($message, $code, $status = 400, $trace = null)
+    protected function sendFail(string $message, string $code, int $status = 400, $trace = null)
     {
         return $this->response()->withStatus($status)->withJson(['status' => 'fail', 'message' => $message, 'code' => $code, 'trace' => $trace]);
     }
