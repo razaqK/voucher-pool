@@ -1,0 +1,24 @@
+{
+  "name": "voucher pool",
+  "description": "voucher pool microservice",
+  "require": {
+    "php": ">=7.2",
+    "wixel/gump": "dev-master",
+    "robmorgan/phinx": "^0.5.3",
+    "nesbot/carbon": "^1.22",
+    "zircote/swagger-php": "^2.0",
+    "slim/slim": "^3.10",
+    "illuminate/database": "^5.6",
+    "monolog/monolog": "^1.23",
+    "phpunit/phpunit": "^7.3",
+    "fzaninotto/faker": "^1.8"
+  },
+  "require-dev": {
+    "consolidation/robo": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  }
+}
